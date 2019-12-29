@@ -25,8 +25,10 @@ weixin.init_app(app)
 def pay_app_api():
     """微信网页支付请求发起"""
     try:
+        total_fee = request.args.get('fee')
+        body = request.args.get('body')
         out_trade_no = weixin.nonce_str
-        raw = weixin.app_api(body=u"测试", out_trade_no=out_trade_no, total_fee=1)
+        raw = weixin.app_api(body=body, out_trade_no=out_trade_no, total_fee=total_fee)
         return jsonify(raw)
     except WeixinError, e:
         print e.message
