@@ -153,6 +153,23 @@ class WeixinPay(object):
         return dict(package=package, appId=self.app_id, signType="MD5",
                     timeStamp=timestamp, nonceStr=nonce_str, sign=sign)
 
+    def app_api(self, **kwargs):
+        """
+        生成给JavaScript调用的数据
+        详细规则参考 https://pay.weixin.qq.com/wiki/doc/api/jsapi.php?chapter=7_7&index=6
+        """
+        kwargs.setdefault("trade_type", "APP")
+        raw = self.unified_order(**kwargs)
+        package = "prepay_id={0}".format(raw["prepay_id"])
+        prepareId = raw["prepay_id"]
+        timestamp = str(int(time.time()))
+        nonce_str = self.nonce_str
+        raw = dict(appid=self.app_id, partnerid=self.mch_id, timestamp=timestamp,
+                   noncestr=nonce_str, package=package, prepayid=prepareId)
+        sign = self.sign(raw)
+        return dict(package=package, partnerid=self.mch_id, appid=self.app_id, signType="MD5",
+                    timestamp=timestamp, noncestr=nonce_str, prepayid=prepareId, sign=sign)
+
     def order_query(self, **data):
         """
         订单查询
